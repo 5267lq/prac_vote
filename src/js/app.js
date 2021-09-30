@@ -29,6 +29,7 @@ App={
         $.getJSON('Election.json',function(election){
             App.contracts.Election=TruffleContract(election);
             App.contracts.Election.setProvider(App.web3Provider);
+            App.listenForEvents();//
             return App.render();
         });
     },
@@ -75,6 +76,15 @@ App={
             content.show();
         }).catch(function(err){
             console.warn(err);
+        });
+    },
+
+    listenForEvents:function(){
+        App.contracts.Election.deployed().then(function(instance){
+            instance.voteEvent({},{fromBlock:0,toBlock:'latest'}).watch(function(error,event){
+                console.log("event triggered",event);
+                App.render();
+            });
         });
     },
 
